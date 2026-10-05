@@ -30,17 +30,23 @@ const setLocalData = async () => {
     await setPic(pic);
     genIndex(markup);
   } catch (e) {
-    throw new Error(e.message);
+    throw e;
   }
 };
 
 //Remote initialization
 const setRemoteData = async () => {
   try {
-    let res = await axios.get(picPath, {
-      responseType: "arraybuffer",
-    });
-    const pic = res.data;
+    let res;
+    let pic;
+    if (/^https?:\/\//i.test(picPath)) {
+      res = await axios.get(picPath, {
+        responseType: "arraybuffer",
+      });
+      pic = res.data;
+    } else {
+      pic = path.join(__dirname, "../local/", picPath);
+    }
     let markup = "";
     if (msgPath) {
       const article = msgPath.split("/").pop();
@@ -56,7 +62,7 @@ const setRemoteData = async () => {
     await setPic(pic);
     genIndex(markup);
   } catch (e) {
-    throw new Error(e.message);
+    throw e;
   }
 };
 
